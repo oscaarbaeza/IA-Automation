@@ -1,0 +1,197 @@
+{
+  "name": "Pizza Orders",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Pizza Orders",
+        "formDescription": "Place your pizza orders here.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your name ",
+              "placeholder": "Enter your name here...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Pizza",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Margherita"
+                  },
+                  {
+                    "option": "Pepperoni"
+                  },
+                  {
+                    "option": "Hawaiian"
+                  },
+                  {
+                    "option": "Veggie"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Size",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Small"
+                  },
+                  {
+                    "option": "Medium"
+                  },
+                  {
+                    "option": "Large"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -1184,
+        -320
+      ],
+      "id": "d059f10c-4faf-4f0d-82c3-85aed082247b",
+      "name": "On form submission",
+      "webhookId": "ea68d56a-8ac1-4b78-a826-d8110ff9fb9f"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appcllmGJL9COQs8l",
+          "mode": "list",
+          "cachedResultName": "Pizza Place",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblosFQqeUA1t2Jii",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l/tblosFQqeUA1t2Jii"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json['Your name '] }}",
+            "Size": "={{ $json.Size }}",
+            "Pizza": "={{ $json.Pizza }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Pizza",
+              "displayName": "Pizza",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -976,
+        -320
+      ],
+      "id": "547c7bac-2734-4c1d-a5c9-9daf363db3ed",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "dkfYNsBPSBpcgOOB",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Madrid",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dcc8d20d-f929-4a7d-9034-9636df07d95b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4d956428d513a6b69eba8d4741f87f1445dfabc9aa6f29b8124ecc9bc9fe937d"
+  },
+  "id": "SvBDjQ1hRmUrrd0lV_whm",
+  "tags": [
+    {
+      "updatedAt": "2026-02-09T21:08:01.376Z",
+      "createdAt": "2026-02-09T21:08:01.376Z",
+      "id": "8Ucpvp0C1t0EuNEf",
+      "name": "Primeros Workflows"
+    }
+  ]
+}

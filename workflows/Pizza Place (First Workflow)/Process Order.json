@@ -1,0 +1,498 @@
+{
+  "name": "Process Order",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "100064d5-fd70-4a16-b50b-a6b32b64c30d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appcllmGJL9COQs8l",
+          "mode": "list",
+          "cachedResultName": "Pizza Place",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblosFQqeUA1t2Jii",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l/tblosFQqeUA1t2Jii"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -16
+      ],
+      "id": "c94ea5f4-b766-46d3-8d74-83a062e9084c",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "dkfYNsBPSBpcgOOB",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "76369b76-2700-4abb-8f91-87ea2bf35413",
+              "leftValue": "={{ $json.Size }}",
+              "rightValue": "Large",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        224
+      ],
+      "id": "0d15bfed-f5a4-4210-b4e2-30c31a79f6f4",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6224fb73-25fa-4144-99be-18ac106717b0",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "72379d5a-f0a3-49b2-9b71-bc535730f88a",
+              "name": "A Pizza",
+              "value": "={{ $json['A Pizza'] }}",
+              "type": "string"
+            },
+            {
+              "id": "68f3f7c0-2442-4758-9261-5e01011d14d4",
+              "name": "Size",
+              "value": "={{ $json.Size }}",
+              "type": "string"
+            },
+            {
+              "id": "c2c6fd87-ebb8-4b12-bf9a-f58a4cb7b73f",
+              "name": "Summary",
+              "value": "= {{ $json.Name }} ordered a {{ $json.Size }} {{ $json['A Pizza'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -208
+      ],
+      "id": "6c064393-4b12-4651-98e8-b21899dea4a4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcllmGJL9COQs8l",
+          "mode": "list",
+          "cachedResultName": "Pizza Place",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblosFQqeUA1t2Jii",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l/tblosFQqeUA1t2Jii"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Summary": "={{ $json.Summary }}",
+            "id": "={{ $('Filter').item.json.id }}",
+            "Name": "=Gay",
+            "Pizza": "={{ $('Filter').item.json['A Pizza'] }}",
+            "Size": "Small"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Pizza",
+              "displayName": "Pizza",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        -208
+      ],
+      "id": "a9f1932b-517b-4549-b50a-622ce843b607",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "dkfYNsBPSBpcgOOB",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d633384f-7fd9-4b8c-81bb-93e9334f833f",
+              "leftValue": "={{ $json.Size }}",
+              "rightValue": "Large",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "ca1eb8d7-16b1-464f-b89d-677ef484dd8d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6224fb73-25fa-4144-99be-18ac106717b0",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "72379d5a-f0a3-49b2-9b71-bc535730f88a",
+              "name": "A Pizza",
+              "value": "={{ $json['A Pizza'] }}",
+              "type": "string"
+            },
+            {
+              "id": "68f3f7c0-2442-4758-9261-5e01011d14d4",
+              "name": "Size",
+              "value": "={{ $json.Size }}",
+              "type": "string"
+            },
+            {
+              "id": "c2c6fd87-ebb8-4b12-bf9a-f58a4cb7b73f",
+              "name": "Summary",
+              "value": "= {{ $json.Name }} ordered a {{ $json.Size }} {{ $json['A Pizza'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        48
+      ],
+      "id": "eba90155-1d7b-42cf-8100-4b047e365335",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcllmGJL9COQs8l",
+          "mode": "list",
+          "cachedResultName": "Pizza Place",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblosFQqeUA1t2Jii",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://airtable.com/appcllmGJL9COQs8l/tblosFQqeUA1t2Jii"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Summary": "={{ $json.Summary }}",
+            "id": "={{ $('If').item.json.id }}",
+            "Name": "=Gay",
+            "Pizza": "={{ $json.Size }}",
+            "Size": "Small"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Pizza",
+              "displayName": "Pizza",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        48
+      ],
+      "id": "7e041744-f94e-476c-8206-248f9028c8ab",
+      "name": "Create or update a record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "dkfYNsBPSBpcgOOB",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "12bbb1c2-5e56-4688-8800-fc7ecc87a721",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4d956428d513a6b69eba8d4741f87f1445dfabc9aa6f29b8124ecc9bc9fe937d"
+  },
+  "id": "9BD56vCc_RHTtPdtm7gMh",
+  "tags": [
+    {
+      "updatedAt": "2026-02-09T21:08:01.376Z",
+      "createdAt": "2026-02-09T21:08:01.376Z",
+      "id": "8Ucpvp0C1t0EuNEf",
+      "name": "Primeros Workflows"
+    }
+  ]
+}
