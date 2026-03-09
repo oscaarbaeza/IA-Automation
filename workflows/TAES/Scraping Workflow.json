@@ -1,0 +1,507 @@
+{
+  "name": "Scraping Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.URL }}\",\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        -144
+      ],
+      "id": "b74dd20b-766e-4374-9c72-658f3653ed34",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HX7ol5cQi23hhzXP",
+          "name": "Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Tu rol es extraer la información de una web que te he pasado y estructurarla en un formato específico.\n\nDebes de extraer la siguiente información:\n- Título: el título de la receta\n- Ingredientes: los ingredientes de la receta y sus cantidades. Si recibes las cantidades en medidas anglosajonas, recuerda cambiarlas a las medidas europeas (gramos, litros...).\n- Pasos: los pasos a seguir para realizar la receta.\n- Dificultad: nivel de dificultad. Si no hay nivel de dificultad, intuye del 1 al 10 un nivel adecuado.\n- Tiempo (en minutos): el tiempo que se tarda en realizar la receta en minutos.\n\nRecibirás un input de <scraped-website>\n\nResponde en formato JSON:\n{\n   \"Titulo\": \"\",\n   \"Ingredientes\": \"\",\n   \"Pasos\": \"\",\n   \"Dificultad\": \"\",\n   \"Tiempo\": \"\",\n   \"Raciones\": \"\"\n}\n\nGuarda toda la información en español."
+            },
+            {
+              "content": "=<scraped-website>\n{{ $json.data.markdown }}\n</scraped-website> "
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"Titulo\": {\n      \"type\": \"string\",\n      \"description\": \"El título de la receta\"\n    },\n    \"Ingredientes\": {\n      \"type\": \"string\",\n      \"description\": \"Los ingredientes de la receta y sus cantidades\"\n    },\n    \"Pasos\": {\n      \"type\": \"string\",\n      \"description\": \"Los pasos a seguir para realizar la receta\"\n    },\n    \"Dificultad\": {\n      \"type\": \"string\",\n      \"description\": \"Nivel de dificultad. Si no hay, inventate uno según la receta\"\n    },\n    \"Tiempo\": {\n      \"type\": \"number\",\n      \"description\": \"El tiempo que se tarda en realizar la receta en minutos. Solo el número.\"\n    },\n    \"Raciones\": {\n      \"type\": \"number\",\n      \"description\": \"Cantidad de comidas que salen de la receta, porciones\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\n    \"Titulo\",\n    \"Ingredientes\",\n    \"Pasos\",\n    \"Dificultad\",\n    \"Tiempo\",\n    \"Raciones\"\n  ]\n}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -144
+      ],
+      "id": "c6bb777c-aca7-4337-bad3-bca53aba5b12",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rpyJ7eLwn6bAj2nY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU",
+          "mode": "list",
+          "cachedResultName": "Recetas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Victory Points",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tiempo": "={{ $json.output[0].content[0].text.Tiempo }}",
+            "Dificultad": "={{ $json.output[0].content[0].text.Dificultad }}",
+            "Pasos": "={{ $json.output[0].content[0].text.Pasos }}",
+            "Ingredientes": "={{ $json.output[0].content[0].text.Ingredientes }}",
+            "Titulo": "={{ $json.output[0].content[0].text.Titulo }}",
+            "Raciones": "={{ $json.output[0].content[0].text.Raciones }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ingredientes",
+              "displayName": "Ingredientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pasos",
+              "displayName": "Pasos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dificultad",
+              "displayName": "Dificultad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tiempo",
+              "displayName": "Tiempo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raciones",
+              "displayName": "Raciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        -144
+      ],
+      "id": "341c9923-5486-4e6b-9edb-6548ec6c5fbd",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "frT8jkYi99WxJVlN",
+          "name": "Google"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "URL Scraping",
+        "formDescription": "Form that gets the url that want to be scraped.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "URL",
+              "placeholder": "e. g. https:/google.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -304,
+        -144
+      ],
+      "id": "b9e55c4a-5c17-4ddf-97f9-a782a0718459",
+      "name": "On form submission",
+      "webhookId": "f90e11b2-a890-4118-9b7d-fbd9767510a9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.link }}\",\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        128
+      ],
+      "id": "38035f54-2baa-40f8-9bf8-efa4e3acc163",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HX7ol5cQi23hhzXP",
+          "name": "Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Tu rol es extraer la información de una web que te he pasado y estructurarla en un formato específico.\n\nDebes de extraer la siguiente información:\n- Título: el título de la receta\n- Ingredientes: los ingredientes de la receta y sus cantidades. Si recibes las cantidades en medidas anglosajonas, recuerda cambiarlas a las medidas europeas (gramos, litros...).\n- Pasos: los pasos a seguir para realizar la receta.\n- Dificultad: nivel de dificultad. Si no hay nivel de dificultad, intuye del 1 al 10 un nivel adecuado.\n- Tiempo (en minutos): el tiempo que se tarda en realizar la receta en minutos.\n\nRecibirás un input de <scraped-website>\n\nResponde en formato JSON:\n{\n   \"Titulo\": \"\",\n   \"Ingredientes\": \"\",\n   \"Pasos\": \"\",\n   \"Dificultad\": \"\",\n   \"Tiempo\": \"\"\n}\n\nGuarda toda la información en español.\n"
+            },
+            {
+              "content": "=<scraped-website>\n{{ $json.data.markdown }}\n</scraped-website> "
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"Titulo\": {\n      \"type\": \"string\",\n      \"description\": \"El título de la receta\"\n    },\n    \"Ingredientes\": {\n      \"type\": \"string\",\n      \"description\": \"Los ingredientes de la receta y sus cantidades\"\n    },\n    \"Pasos\": {\n      \"type\": \"string\",\n      \"description\": \"Los pasos a seguir para realizar la receta\"\n    },\n    \"Dificultad\": {\n      \"type\": \"string\",\n      \"description\": \"Nivel de dificultad. Si no hay, inventate uno según la receta\"\n    },\n    \"Tiempo\": {\n      \"type\": \"number\",\n      \"description\": \"El tiempo que se tarda en realizar la receta en minutos. Solo el número.\"\n    },\n    \"Raciones\": {\n      \"type\": \"number\",\n      \"description\": \"Cantidad de comidas que salen de la receta, porciones\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\n    \"Titulo\",\n    \"Ingredientes\",\n    \"Pasos\",\n    \"Dificultad\",\n    \"Tiempo\",\n    \"Raciones\"\n  ]\n}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        128
+      ],
+      "id": "39d1bf7b-9649-41d6-823b-0c78de0fd14a",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "rpyJ7eLwn6bAj2nY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "feedUrl": "https://rss.app/feeds/tfPVyzj5yHYcjc3M.xml"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        128
+      ],
+      "id": "423e3094-b0a2-4316-9411-4cd7a4c1c9fd",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU",
+          "mode": "list",
+          "cachedResultName": "Recetas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Victory Points",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlpjDaX9VaYr0_E9a-M7uNjhyupIxWwQcm2lF92n7GU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tiempo": "={{ $json.output[0].content[0].text.Tiempo }}",
+            "Dificultad": "={{ $json.output[0].content[0].text.Dificultad }}",
+            "Pasos": "={{ $json.output[0].content[0].text.Pasos }}",
+            "Ingredientes": "={{ $json.output[0].content[0].text.Ingredientes }}",
+            "Titulo": "={{ $json.output[0].content[0].text.Titulo }}",
+            "Raciones": "={{ $json.output[0].content[0].text.Raciones }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ingredientes",
+              "displayName": "Ingredientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pasos",
+              "displayName": "Pasos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dificultad",
+              "displayName": "Dificultad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tiempo",
+              "displayName": "Tiempo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raciones",
+              "displayName": "Raciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        128
+      ],
+      "id": "90a82aa1-48a1-408d-9dcf-b939c2c785f5",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "frT8jkYi99WxJVlN",
+          "name": "Google"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3d5d40c7-500d-4c44-a680-06713d189e55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4d956428d513a6b69eba8d4741f87f1445dfabc9aa6f29b8124ecc9bc9fe937d"
+  },
+  "id": "IFLZVp5kaIcYS-u9LDAsl",
+  "tags": [
+    {
+      "name": "TAES",
+      "id": "64x9GAy9TiyJfFBa",
+      "updatedAt": "2026-03-09T21:13:09.184Z",
+      "createdAt": "2026-03-09T21:13:09.184Z"
+    }
+  ]
+}
